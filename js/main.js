@@ -144,7 +144,7 @@
 		// camera.lookAt( scene.position );
 
 		controls.update();
-		// renderer.render(scene, camera);
+		renderer.render(scene, camera);
 		effect.render( scene, camera );
 
 	}
