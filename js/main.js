@@ -1,7 +1,7 @@
 (function () {
 	var camera, scene, renderer, effect;
 
-	var mesh, lightMesh, geometry;
+	var mesh, lightMesh;
 	var spheres = [];
 
 	var directionalLight, pointLight;
@@ -9,6 +9,8 @@
 	var mouseX = 0, mouseY = 0;
 
 	var windowHalfX, windowHalfY;
+
+	var controls;
 
 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -22,20 +24,38 @@
 
 		controls = new THREE.DeviceOrientationControls(camera);
 
-		var textureCube = new THREE.CubeTextureLoader()
-			.setPath('images/background/')
-			.load(['negx.jpg', 'posx.jpg', 'negy.jpg', 'posy.jpg', 'negz.jpg', 'posz.jpg']);
+		// var textureCube = new THREE.CubeTextureLoader()
+		// 	.setPath('images/background/')
+		// 	.load(['negx.jpg', 'posx.jpg', 'negy.jpg', 'posy.jpg', 'negz.jpg', 'posz.jpg']);
 
 		scene = new THREE.Scene();
-		scene.background = textureCube;
+		// scene.background = textureCube;
 
-		var geometry = new THREE.SphereBufferGeometry( 100, 32, 16 );
+
+
+
+		var geometry = new THREE.SphereGeometry( 500, 16, 8 );
+		geometry.scale( - 1, 1, 1 );
+
+		var material = new THREE.MeshBasicMaterial( {
+			map: new THREE.TextureLoader().load('images/bg.jpg')
+		} );
+
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+
+		var geometry = new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xff00ff, side: THREE.BackSide, wireframe: true } );
+		var mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+
 
 
 		//
 
 		renderer = new THREE.WebGLRenderer();
 		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.getElementById('canvases').appendChild(renderer.domElement);
 
 		effect = new THREE.StereoEffect( renderer );
