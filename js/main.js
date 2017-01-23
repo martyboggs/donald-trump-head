@@ -1,4 +1,6 @@
 (function () {
+
+	"use strict";
 	var camera, scene, renderer, effect;
 
 	var mesh, lightMesh;
@@ -12,9 +14,10 @@
 
 	var controls;
 
-
-	init();
-	animate();
+	window.addEventListener('load', function () {
+		init();
+		animate();
+	}, false);
 
 	function init() {
 
@@ -47,8 +50,6 @@
 		var mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 
-
-
 		//
 
 		renderer = new THREE.WebGLRenderer();
@@ -73,6 +74,8 @@
 
 		camera.aspect = window.innerWidth / window.innerHeight;
 		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
 
 		effect.setSize( window.innerWidth, window.innerHeight );
 
@@ -103,6 +106,7 @@
 		// camera.lookAt( scene.position );
 
 		controls.update();
+		renderer.render(scene, camera);
 		effect.render( scene, camera );
 
 	}
