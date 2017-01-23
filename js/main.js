@@ -2,11 +2,10 @@
 
 	"use strict";
 	var camera, scene, renderer, effect;
+	var light1, light2;
 
-	var mesh, lightMesh;
+	var mesh;
 	var spheres = [];
-
-	var directionalLight, pointLight;
 
 	var mouseX = 0, mouseY = 0;
 
@@ -14,10 +13,22 @@
 
 	var controls;
 
+	var world;
+	var bodies = [];
+	var meshes = [];
+
 	window.addEventListener('load', function () {
+		initPhysics();
 		init();
+		setInterval(oimoLoop, 1/60*1000);
 		animate();
 	}, false);
+
+	function initPhysics() {
+		world = new OIMO.World(1 / 60, 2, 8, false);
+		world.gravity = new OIMO.Vec3(0, -9.8, 0);
+		world.worldscale(100);
+	}
 
 	function init() {
 
@@ -32,27 +43,43 @@
 		scene = new THREE.Scene();
 		// scene.background = textureCube;
 
+		light1 = new THREE.SpotLight(0xffffff, 1);
+		light1.castShadow = true;
+		light1.position.set(0, 200, 140);
+		light1.rotation.set(Math.PI, 1, 0);
+		scene.add(light1);
+		scene.add(new THREE.CameraHelper(light1.shadow.camera));
 
+		// light2 = new THREE.AmbientLight(0xffffff, 0.2);
+		// scene.add(light2);
 
-
-		var geometry = new THREE.SphereGeometry( 500, 16, 8 );
-		geometry.scale( - 1, 1, 1 );
-
-		var material = new THREE.MeshBasicMaterial( {
+		// bg
+		var geometry = new THREE.SphereGeometry(500, 16, 8);
+		geometry.scale(-1, 1, 1);
+		var material = new THREE.MeshBasicMaterial({
 			map: new THREE.TextureLoader().load('images/bg.jpg')
-		} );
+		});
+		var mesh = new THREE.Mesh(geometry, material);
+		scene.add(mesh);
 
-		var mesh = new THREE.Mesh( geometry, material );
-		scene.add( mesh );
+		// eye1
+		var geometry = new THREE.SphereGeometry(20, 16, 16);
+		var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({color: 'white'}));
+		mesh.position.set(-40, 0, -200);
+		meshes.push(mesh);
+		bodies.push(new OIMO.Body({type:'sphere', size: [20, 20, 20], pos:[-40, 0, -200], move: false, world: world}));
+		scene.add(mesh);
 
-		var geometry = new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff00ff, side: THREE.BackSide, wireframe: true } );
-		var mesh = new THREE.Mesh( geometry, material );
-		scene.add( mesh );
-
-		//
+		// eye2
+		var geometry = new THREE.SphereGeometry(20, 16, 16);
+		var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({color: 'white'}));
+		mesh.position.set(40, 0, -200);
+		meshes.push(mesh);
+		bodies.push(new OIMO.Body({type:'sphere', size: [20, 20, 20], pos:[40, 0, -200], move: false, world: world}));
+		scene.add(mesh);
 
 		renderer = new THREE.WebGLRenderer();
+		renderer.shadowMap.enabled = true;
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		document.getElementById('canvases').appendChild(renderer.domElement);
@@ -66,6 +93,7 @@
 		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 	}
+
 
 	function onWindowResize() {
 
@@ -88,7 +116,17 @@
 
 	}
 
-	//
+	function oimoLoop() {
+		world.step();
+		var body, mesh;
+		for (var i = 0; i < meshes.length; i += 1) {
+			body = bodies[i];
+			mesh = meshes[i];
+			mesh.position.copy(body.getPosition());
+			mesh.quaternion.copy(body.getQuaternion());
+		}
+		document.getElementById("info").innerHTML = world.performance.show();
+	}
 
 	function animate() {
 
@@ -106,20 +144,9 @@
 		// camera.lookAt( scene.position );
 
 		controls.update();
-		renderer.render(scene, camera);
+		// renderer.render(scene, camera);
 		effect.render( scene, camera );
 
 	}
-
-
-	// var pauseScreen = document.createElement('div');
-	// pauseScreen.className = pauseScreen.id = 'overlay';
-	// pauseScreen.innerHTML = '<h1>Three.js World</h1><h3>Donald Trump\'s Fat Head</h3>click to play';
-	// document.getElementById('canvases').insertBefore(pauseScreen, renderer.domElement);
-
-	// var gameUI = document.createElement('div');
-	// gameUI.className = gameUI.id = 'ui';
-	// gameUI.innerHTML = '<div>Score:&nbsp; <span id="score">0</span></div><div>Deaths:&nbsp; <span id="deaths">0</span></div>';
-	// document.getElementById('canvases').insertBefore(gameUI, renderer.domElement);
 
 }());
