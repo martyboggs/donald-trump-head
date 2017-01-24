@@ -45,8 +45,12 @@
 
 		light1 = new THREE.SpotLight(0xffffff, 1);
 		light1.castShadow = true;
-		light1.position.set(0, 200, 140);
-		light1.rotation.set(Math.PI, 1, 0);
+		light1.position.set(0, 0, -400);
+		var gui = new dat.GUI();
+		light1.rotation.set(0, 0, 0);
+		gui.add(light1.position, 'x', -200, 400);
+		gui.add(light1.position, 'y', -200, 400);
+		gui.add(light1.position, 'z', -400, 400);
 		scene.add(light1);
 		scene.add(new THREE.CameraHelper(light1.shadow.camera));
 
@@ -66,12 +70,13 @@
 
 		items = [
 			// type     size                                 pos            rot        scale    color   move
-			['box', [200, 50],                           [-20, 200, -200], [0, 0, 0], [1, 1, 1], 'black', false],
-			['sphere', [20, 16, 16, 2*p, 2*p, p, p/*, p/3, 2*p/3, p/6, p/3 */], [-40, 0, -200], [0, 0, 0], [1, 1, 1], 'white', true],
-			['sphere', [20, 16, 16, 2*p, 2*p, p, p],                     [40, 0, -200], [0, 0, 0], [1, 1, 1], 'white', true],
-			['box', [50, 20],                           [-20, -20, -200], [0, 0, 0], [1, 1, 1], '#eee293', true],
-			['box', [20, 20],                                [20, 0, -200], [0, 0, 0], [1, 1, 1], '#eee293', true],
-			['box', [20, 20],                           [20, 0, -200], [0, 0, 0], [1, 1, 1], '#eee293', true],
+			['box', [200, 50],                          [-20, 200, -200], [0, 0, 0], [1, 1, 1], 'black', false],
+			['sphere', [20, 16, 16, 2*p, 2*p, p, p],    [-40, 0, -200, 150], [0, 0, 0], [1, 1, 1], 'white', true],
+			['sphere', [20, 16, 16, 2*p, 2*p, p, p],    [40, 0, -200, 150], [0, 0, 0], [1, 1, 1], 'white', true],
+			['sphere', [80, 16, 16, p, p, p, p],        [0, 0, -200, 200], [0, 0, 0], [1, 1, 1], '#eee293', true],
+			['box', [50, 20],                           [-10, -20, -200, 100], [0, 0, 0], [1, 1, 1], '#eee293', true],
+			['box', [20, 20],                           [50, 0, -200, 100], [0, 0, 0], [1, 1, 1], '#eee293', true],
+			['box', [20, 20],                           [60, 0, -200, 100], [0, 0, 0], [1, 1, 1], '#eee293', true],
 		];
 
 		for (var i = 0; i < items.length; i += 1) {
@@ -130,6 +135,7 @@
 		mesh.position.set(arr[2][0], arr[2][1], arr[2][2]);
 		mesh.rotation.set(arr[3][0], arr[3][1], arr[3][2]);
 		mesh.scale.set(arr[4][0], arr[4][1], arr[4][2]);
+		mesh.material.side = THREE.DoubleSide;
 		meshes.push(mesh);
 		// body
 		bodies.push(new OIMO.Body({type: arr[0], size: size, pos: [arr[2][0], arr[2][1], arr[2][2]], move: arr[6], world: world, name: i.toString(), density: 1}));
@@ -142,14 +148,14 @@
 				body1: '0',
 				body2: i.toString(),
 				collision: true,
-				pos1: [0, arr[2][0], 0],
+				pos1: [arr[2][0], 0, 0],
 				pos2: [0, yFromCenter, 0],
 				axe1: [1, 0, 0],
 				axe2: [1, 0, 0],
-				min: 150,
-				max: 200,
+				min: arr[2][3] - 50 < 0 ? 0 : arr[2][3] - 50,
+				max: arr[2][3],
 				limite: null,
-				spring: [9, 0.2],
+				spring: [8, 5],
 				motor: null,
 				name: 'joint'
 			});
