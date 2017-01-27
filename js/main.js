@@ -74,15 +74,15 @@
 
 		items = [
 			// type     size                                 pos            rot        scale    color   move
-			['box', [20, 5],                          [-2, 20, -20], [0, 0, 0], [1, 1, 1], 'black', true],
-			['hair', [3, 3, 3],                   [-10, -2, -20, 1], [0, 0, 0], [2, 2, 2], 'black', true],
-			['eye', [2, 2, 2, 2*p, 2*p, p, p],    [-4, 0, -20, 1], [0, 0, 0], [1, 1, 1], 'white', true],
-			['eye', [2, 2, 2, 2*p, 2*p, p, p],    [4, 0, -20, 1], [0, 0, 0], [1, 1, 1], 'white', true],
-			['face', [5, 5, 5, p, p, p, p],        [-1, -6, -20, 1], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
-			['face', [5, 5, 5, p, p, p, p],        [1, -6, -20, 1], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
-			['face', [3, 3, 3, p, p, p, p],        [0, -9, -20, 2], [0, 0, 0], [1, 1.3, 0.4], '#eee293', true],
-			// ['cylinder', [40, 20],                      [0, 40, -200, 13], [0, 0, 0], [1, 1, 1], '#eee293', true],
-			// ['box', [50, 20],                           [-10, 60, -200, 8], [0, 0, 0], [1, 1, 1], '#eee293', true],
+			['box', [20, 5],                       [-2, 30, -20],     [0, 0, 0], [1, 1, 1], 'black', true],
+			['hair', [3, 3, 3],                    [-1, -2, -25,   4], [0, 0, 0], [8, 8, 8], 'black', true],
+			['eye', [2, 2, 2, 2*p, 2*p, p, p],     [-2, -4, -20,   18], [0, 0, 0], [1, 1, 1], 'white', true],
+			['eye', [2, 2, 2, 2*p, 2*p, p, p],     [2, -4, -20,    18], [0, 0, 0], [1, 1, 1], 'white', true],
+			['face', [5, 5, 5, p, p, p, p],        [-12, -16, -20, 14], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
+			['face', [5, 5, 5, p, p, p, p],        [12, -16, -20,  14], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
+			['face', [3, 3, 3, p, p, p, p],        [0, -19, -20,   22], [0, 0, 0], [1, 1.3, 0.4], '#eee293', true],
+			// ['cylinder', [40, 20],                [0, 40, -200, 13], [0, 0, 0], [1, 1, 1], '#eee293', true],
+			// ['box', [50, 20],                     [-10, 60, -200, 8], [0, 0, 0], [1, 1, 1], '#eee293', true],
 		];
 
 		for (var i = 0; i < items.length; i += 1) {
@@ -131,6 +131,7 @@
 		var texture = false;
 		var material = new THREE.MeshLambertMaterial({color: arr[5]});
 		var mesh = new THREE.Object3D();
+		var density = 1;
 		switch (arr[0]) {
 			case 'face':
 				pType = 'box';
@@ -147,6 +148,7 @@
 					mesh.geometry = geometry1;
 					mesh.material = new THREE.MultiMaterial(materials);
 				});
+				density = 0.06;
 				size = [2*arr[1][0]*arr[4][0], arr[1][1]*arr[4][1], arr[1][2]*arr[4][2]];
 			break;
 			case 'eye':
@@ -173,7 +175,7 @@
 		mesh.material.side = THREE.DoubleSide;
 		meshes.push(mesh);
 		// body
-		bodies.push(new OIMO.Body({type: pType, size: size, pos: [arr[2][0], arr[2][1], arr[2][2]], move: arr[6], world: world, name: i.toString(), density: 1}));
+		bodies.push(new OIMO.Body({type: pType, size: size, pos: [arr[2][0], arr[2][1], arr[2][2]], move: arr[6], world: world, name: i.toString(), density: density}));
 		scene.add(mesh);
 		var yFromCenter = arr[0] === 'sphere' ? arr[1][0] : arr[1][1] / 2;
 		if (i !== 0) {
@@ -190,7 +192,7 @@
 				min: arr[2][3] - 50 <= 0 ? 0 : arr[2][3] - 50,
 				max: arr[2][3],
 				limite: null,
-				spring: [8, 10], // frequency: 8 , damping: 0.1 (springy) 10 (not springy)
+				spring: [4, 0.2], // frequency: 8 , damping: 0.1 (springy) 10 (not springy)
 				motor: null,
 				name: 'joint'
 			});
@@ -202,13 +204,14 @@
 		world.step();
 
 		var rot = bodies[0].getRotation();
-		bodies[0].resetPosition(6 * Math.sin(osc), 10, -20);
+		bodies[0].resetPosition(6 * Math.sin(osc), 30, -20);
 		bodies[0].resetRotation(0, 0, 0);
-		meshes[0].rotation.set(0, 0, 0);
+
+		bodies[1].resetRotation(0, 0, 0);
 
 		// eyeball alignment
 		var pos2 = bodies[2].getPosition();
-		bodies[3].resetPosition(pos2.x + 80, pos2.y, pos2.z);
+		bodies[3].resetPosition(pos2.x + 7, pos2.y, pos2.z);
 
 		// faces
 		bodies[4].resetRotation(0, 0, 0);
