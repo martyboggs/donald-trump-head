@@ -47,19 +47,19 @@
 
 		light1 = new THREE.SpotLight(0xffffff, 1);
 		light1.castShadow = true;
-		light1.position.set(0, 0, -400);
+		light1.position.set(-13, 39, 41);
 		light1.rotation.set(0, 0, 0);
 		scene.add(light1);
 		// scene.add(new THREE.CameraHelper(light1.shadow.camera));
 
-		light2 = new THREE.AmbientLight(0xffffff, 0.1);
+		light2 = new THREE.AmbientLight(0xffffff, 0.14);
 		scene.add(light2);
 
-		var gui = new dat.GUI();
-		gui.add(light1.position, 'x', -200, 400);
-		gui.add(light1.position, 'y', -200, 400);
-		gui.add(light1.position, 'z', -400, 400);
-		gui.add(light2, 'intensity', 0, 0.5);
+		// var gui = new dat.GUI();
+		// gui.add(light1.position, 'x', -200, 400);
+		// gui.add(light1.position, 'y', -200, 400);
+		// gui.add(light1.position, 'z', -400, 400);
+		// gui.add(light2, 'intensity', 0, 0.5);
 
 		// bg
 		var geometry = new THREE.SphereGeometry(500, 16, 8);
@@ -74,15 +74,15 @@
 
 		items = [
 			// type     size                                 pos            rot        scale    color   move
-			['box', [20, 5],                       [-2, 30, -20],     [0, 0, 0], [1, 1, 1], 'black', true],
-			['hair', [3, 3, 3],                    [-1, -2, -25,   4], [0, 0, 0], [8, 8, 8], 'black', true],
-			['eye', [2, 2, 2, 2*p, 2*p, p, p],     [-2, -4, -20,   18], [0, 0, 0], [1, 1, 1], 'white', true],
-			['eye', [2, 2, 2, 2*p, 2*p, p, p],     [2, -4, -20,    18], [0, 0, 0], [1, 1, 1], 'white', true],
-			['face', [5, 5, 5, p, p, p, p],        [-12, -16, -20, 14], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
-			['face', [5, 5, 5, p, p, p, p],        [12, -16, -20,  14], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
-			['face', [3, 3, 3, p, p, p, p],        [0, -19, -20,   22], [0, 0, 0], [1, 1.3, 0.4], '#eee293', true],
-			// ['cylinder', [40, 20],                [0, 40, -200, 13], [0, 0, 0], [1, 1, 1], '#eee293', true],
-			// ['box', [50, 20],                     [-10, 60, -200, 8], [0, 0, 0], [1, 1, 1], '#eee293', true],
+			['box', [20, 5],                       [-2, 30, -30],       [0, 0, 0], [1, 1, 1], 'black', true],
+			['hair', [3, 3, 3],                    [-1, -2, -35,   4],  [0, 0, 0], [8, 8, 8], 'black', true],
+			['eye', [2, 2, 2, 0, 2*p, 0, p],  [-2, -4, -30,   18], [0, 0, 0], [1, 1, 1], 'white', true],
+			['eye', [2, 2, 2, 0, 2*p, 0, p],     [2, -4, -30,    18], [0, 0, 0], [1, 1, 1], 'white', true],
+			['face', [5, 5, 5, 0, p, 0, p],        [-12, -16, -30, 14], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
+			['face', [5, 5, 5, 0, p, 0, p],        [12, -16, -30,  14], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
+			['face', [3, 3, 3, 0, p, 0, p],        [0, -19, -30,   22], [0, 0, 0], [1, 1.3, 0.4], '#eee293', true],
+			// ['cylinder', [40, 20],                [0, 40, -30, 13], [0, 0, 0], [1, 1, 1], '#eee293', true],
+			// ['box', [50, 20],                     [-10, 60, -30, 8], [0, 0, 0], [1, 1, 1], '#eee293', true],
 		];
 
 		for (var i = 0; i < items.length; i += 1) {
@@ -153,6 +153,7 @@
 			break;
 			case 'eye':
 				pType = 'sphere';
+				console.log(arr[1][0], 16, 16, arr[1][3], arr[1][4], arr[1][5], arr[1][6]);
 				geometry = new THREE.SphereGeometry(arr[1][0], 16, 16, arr[1][3], arr[1][4], arr[1][5], arr[1][6]);
 				size = [arr[1][0]*arr[4][0], arr[1][1]*arr[4][1], arr[1][2]*arr[4][2]];
 				texture = textureLoader.load('images/eye.jpg');
@@ -204,7 +205,7 @@
 		world.step();
 
 		var rot = bodies[0].getRotation();
-		bodies[0].resetPosition(6 * Math.sin(osc), 30, -20);
+		bodies[0].resetPosition(6 * Math.sin(osc), 30, -30);
 		bodies[0].resetRotation(0, 0, 0);
 
 		bodies[1].resetRotation(0, 0, 0);
