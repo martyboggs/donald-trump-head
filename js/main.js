@@ -88,9 +88,9 @@
 			['box', [20, 5],                       [-2, 30, -30],       [0, 0, 0], [1, 1, 1], 'black', true],
 			['eye', [2, 2, 2, 0, 2*p, 0, p],       [-2, -4, -30,   22], [0, 0, 0], [1, 1, 1], 'white', true],
 			['eye', [2, 2, 2, 0, 2*p, 0, p],       [2, -4, -30,    22], [0, 0, 0], [1, 1, 1], 'white', true],
-			['face', [5, 5, 5, 0, p, 0, p],        [-12, -16, -30, 24], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
-			['face', [5, 5, 5, 0, p, 0, p],        [12, -16, -30,  24], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
-			['face', [3, 3, 3, 0, p, 0, p],        [0, -19, -30,   32], [0, 0, 0], [1, 1.3, 0.4], '#eee293', true],
+			// ['face', [5, 5, 5, 0, p, 0, p],        [-12, -16, -30, 24], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
+			// ['face', [5, 5, 5, 0, p, 0, p],        [12, -16, -30,  24], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
+			// ['face', [3, 3, 3, 0, p, 0, p],        [0, -19, -30,   32], [0, 0, 0], [1, 1.3, 0.4], '#eee293', true],
 			['hair', [1, 1, 4],                    [-1, -2, -30,   15], [0, 0, 0], [1, 1, 1], 'black', true],
 			// bone (include above as 1st bone)
 			// bone
@@ -180,7 +180,7 @@
 						bone = j === mesh.skeleton.bones.length ? mesh : mesh.skeleton.bones[j];
 						// body
 						var xPos =       [0,  0,  5, 0, 0, -5, 0][j];
-						var jointLen =   [15,  15,  25,  15,  15,  25, 60][j];
+						var jointLen =   [15,  15,  25,  15,  15,  25, 20][j];
 						var jointDepth = [-10, -10,  10, -10,  -10,  10, 0][j];
 						bodies.push(new OIMO.Body({type: pType, size: size, pos: [xPos, arr[2][1] + bone.position.y, arr[2][2] + bone.position.z], move: arr[6], world: world, name: i.toString() + j.toString(), density: density}));
 						var yFromCenter = arr[0] === 'sphere' ? arr[1][0] : arr[1][1] / 2;
@@ -288,17 +288,17 @@
 
 			mesh.position.copy(body.getPosition());
 			mesh.quaternion.copy(body.getQuaternion());
-			if (i === 6) {
-				var mainPos = bodies[mesh.skeleton.bones.length + 6].getPosition();
+			if (i === 3) {
+				var mainPos = bodies[mesh.skeleton.bones.length + 3].getPosition();
 				debugHairs[mesh.skeleton.bones.length].position.copy(mainPos);
 				for (var j = 0; j < mesh.skeleton.bones.length; j += 1) {
-					var pos = bodies[j + 6].getPosition();
+					var pos = bodies[j + 3].getPosition();
 					mesh.skeleton.bones[j].position.x = mainPos.x - pos.x;
 					mesh.skeleton.bones[j].position.y = mainPos.y - pos.y;
 					mesh.skeleton.bones[j].position.z = mainPos.z - pos.z;
-					mesh.skeleton.bones[j].quaternion.copy(bodies[j + 6].getQuaternion());
-					debugHairs[j].position.copy(bodies[j + 6].getPosition());
-					debugHairs[j].quaternion.copy(bodies[j + 6].getQuaternion());
+					// mesh.skeleton.bones[j].quaternion.copy(bodies[j + 3].getQuaternion());
+					debugHairs[j].position.copy(bodies[j + 3].getPosition());
+					// debugHairs[j].quaternion.copy(bodies[j + 3].getQuaternion());
 				}
 			} else {
 			}
