@@ -91,7 +91,7 @@
 			['face', [5, 5, 5, 0, p, 0, p],        [-12, -16, -30, 24], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
 			['face', [5, 5, 5, 0, p, 0, p],        [12, -16, -30,  24], [0, 0, 0], [1, 1.3, 0.2], '#eee293', true],
 			['face', [3, 3, 3, 0, p, 0, p],        [0, -19, -30,   32], [0, 0, 0], [1, 1.3, 0.4], '#eee293', true],
-			['hair', [0.3, 0.3, 0.5],              [-1, -2, -40,   15],  [0, 0, 0], [8, 8, 8], 'black', true],
+			['hair', [1, 1, 4],                    [-1, -2, -30,   15], [0, 0, 0], [1, 1, 1], 'black', true],
 			// bone (include above as 1st bone)
 			// bone
 			// bone
@@ -116,7 +116,6 @@
 
 		window.addEventListener( 'resize', onWindowResize, false );
 		document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
 	}
 
 
@@ -163,7 +162,6 @@
 				pType = 'box';
 				jsonLoader.load('js/models/trumphair.json', function (geometry1, materials) {
 					for ( var j = 0; j < materials.length; j += 1) {
-						console.log(materials[j])
 						materials[j].skinning = true;
 					}
 					material = new THREE.MultiMaterial(materials);
@@ -177,21 +175,22 @@
 					mesh.material.side = THREE.DoubleSide;
 					meshes.push(mesh);
 					scene.add(mesh);
-					for (var j = 0; j < mesh.skeleton.bones.length; j += 1) {
-						bone = mesh.skeleton.bones[j];
+					var gui = new dat.GUI();
+					for (var j = 0; j < mesh.skeleton.bones.length + 1; j += 1) {
+						bone = j === mesh.skeleton.bones.length ? mesh : mesh.skeleton.bones[j];
 						// body
-						var jointLen = [10, 30, 10, 10, 30, 10][j];
-						var jointDepth = [0, -10, -10, 0, -10, -10][j];
-						var xPos = [-10, -10, -10, 10, 10, 10][j];
-						bodies.push(new OIMO.Body({type: pType, size: size, pos: [xPos, arr[2][1] + bone.position.y * arr[4][1], arr[2][2] + bone.position.z * arr[4][2]], rot: [bone.rotation.x, bone.rotation.y, bone.rotation.z], move: true, world: world, name: i.toString() + j.toString(), density: density}));
+						var xPos =       [0,  0,  5, 0, 0, -5, 0][j];
+						var jointLen =   [15,  15,  25,  15,  15,  25, 60][j];
+						var jointDepth = [-10, -10,  10, -10,  -10,  10, 0][j];
+						bodies.push(new OIMO.Body({type: pType, size: size, pos: [xPos, arr[2][1] + bone.position.y, arr[2][2] + bone.position.z], move: arr[6], world: world, name: i.toString() + j.toString(), density: density}));
 						var yFromCenter = arr[0] === 'sphere' ? arr[1][0] : arr[1][1] / 2;
 						new OIMO.Link({
 							world: world,
 							type: 'jointDistance',
 							body1: '0',
 							body2: i.toString() + j.toString(),
-							collision: true,
-							pos1: [xPos, 0, -10 + jointDepth], // move back
+							collision: j < mesh.skeleton.bones.length ? true : false,
+							pos1: [xPos, 0, jointDepth], // move back
 							pos2: [0, yFromCenter, 0],
 							axe1: [0, 1, 0],
 							axe2: [0, 1, 0],
@@ -275,15 +274,6 @@
 		bodies[4].resetRotation(0, 0, 0);
 		bodies[5].resetRotation(0, 0, 0);
 
-		// // hair
-		// bodies[6].resetRotation(0, 0, 0);
-		// bodies[7].resetRotation(0, 0, 0);
-		// bodies[8].resetRotation(0, 0, 0);
-		// bodies[9].resetRotation(0, 0, 0);
-		// bodies[10].resetRotation(0, 0, 0);
-		// bodies[11].resetRotation(0, 0, 0);
-
-
 		osc += 0.02;
 
 		var body, mesh;
@@ -291,16 +281,26 @@
 			body = bodies[i];
 			mesh = meshes[i];
 
+// both at 5,5,5
+// physics objects move to 0, 0, 0
+
+
+
+			mesh.position.copy(body.getPosition());
+			mesh.quaternion.copy(body.getQuaternion());
 			if (i === 6) {
+				var mainPos = bodies[mesh.skeleton.bones.length + 6].getPosition();
+				debugHairs[mesh.skeleton.bones.length].position.copy(mainPos);
 				for (var j = 0; j < mesh.skeleton.bones.length; j += 1) {
-					mesh.skeleton.bones[j].position.copy(bodies[j + 6].getPosition());
+					var pos = bodies[j + 6].getPosition();
+					mesh.skeleton.bones[j].position.x = mainPos.x - pos.x;
+					mesh.skeleton.bones[j].position.y = mainPos.y - pos.y;
+					mesh.skeleton.bones[j].position.z = mainPos.z - pos.z;
 					mesh.skeleton.bones[j].quaternion.copy(bodies[j + 6].getQuaternion());
 					debugHairs[j].position.copy(bodies[j + 6].getPosition());
 					debugHairs[j].quaternion.copy(bodies[j + 6].getQuaternion());
 				}
 			} else {
-				mesh.position.copy(body.getPosition());
-				mesh.quaternion.copy(body.getQuaternion());
 			}
 		}
 		document.getElementById('info').innerHTML = world.performance.show();
@@ -310,6 +310,17 @@
 
 	function animate() {
 		oimoLoop();
+
+		if (keyboard.pressed('w')) {
+			camera.position.z -= 1;
+		} else if (keyboard.pressed('s')) {
+			camera.position.z += 1;
+		}
+		if (keyboard.pressed('a')) {
+			camera.position.x -= 1;
+		} else if (keyboard.pressed('d')) {
+			camera.position.x += 1;
+		}
 
 		requestAnimationFrame(animate);
 		render();
